@@ -1,0 +1,4 @@
+metadata:
+  name: ${project.artifactId}-logback
+  annotations:
+    maven.fabric8.io/cm/logback.xml: src/main/resources/logback.xml

@@ -1,0 +1,4 @@
+metadata:
+  name: ${project.artifactId}-properties
+  annotations:
+    maven.fabric8.io/cm/application.properties: src/main/resources/application-openshift.properties

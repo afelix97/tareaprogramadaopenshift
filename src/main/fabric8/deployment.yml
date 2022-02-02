@@ -1,0 +1,138 @@
+metadata:
+  labels:
+    project: ${project.artifactId}
+    version: ${project.version}
+  annotations:
+    sidecar.istio.io/inject: "true"
+spec:
+  template:
+    metadata:
+      labels:
+        project: ${project.artifactId}
+        version: ${project.version}
+    spec:
+      containers:
+        - 
+          resources:
+            requests:
+              cpu: "0.5"
+              memory: 256Mi
+            limits:
+              cpu: "1.0"
+              memory: 512Mi
+          env:
+          - name: TZ
+            value: 'America/Mexico_City'
+          - name: JAEGER_SERVICE_NAME
+            value: ${project.artifactId}
+          - name: IS_OPENSHIFT_CONTAINER
+            value: true
+          - name: AFORE_ID
+            value: '508'
+          - name: TIPO_MENSAJE
+            value: '01'
+          - name: START_DELAY
+            value: 5000
+          - name: MAINTANANCE_START
+            value: '0 30 9 * * ?'
+          - name: MAINTANANCE_END
+            value: '0 30 6 * * ?'
+          - name: ENDPOINT_URL
+            value: ''
+          - name: ENDPOINT_RECEIVE_TIMEOUT
+            value: 5000
+          - name: ENDPOINT_CONNECTION_TIMEOUT
+            value: 2000
+          - name: ENDPOINT_REQUEST_TIMEOUT
+            value: 5000
+          - name: SSL_VERIFIER
+            value: false
+          - name: ENDPOINT_KEYSTORE_PATH
+            value: '/opt/security/keystore/aforecoppel.jks'
+          - name: ENDPOINT_KEYSTORE_PASSWORD
+            value: 'n0t13n3!'
+          - name: BITACORAAFOREDIGITAL_DB_SERVICE_NAME
+            value: '10.49.124.40'
+          - name: BITACORAAFOREDIGITAL_DB_PORT
+            value: '5432'
+          - name: BITACORAAFOREDIGITAL_DB_NAME
+            value: 'bitacoraaforedigital'
+          - name: BITACORAAFOREDIGITAL_DB_USER
+            valueFrom:
+              secretKeyRef:
+                key: bitacoraaforedigital.db-user
+                name: ${project.artifactId}-secrets
+          - name: BITACORAAFOREDIGITAL_DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: bitacoraaforedigital.db-password
+                name: ${project.artifactId}-secrets
+          - name: AFOREDIGITAL_DB_SERVICE_NAME
+            value: '10.49.124.39'
+          - name: AFOREDIGITAL_DB_PORT
+            value: '5432'
+          - name: AFOREDIGITAL_DB_NAME
+            value: 'aforedigital'
+          - name: AFOREDIGITAL_DB_USER
+            valueFrom:
+              secretKeyRef:
+                key: aforedigital.db-user
+                name: ${project.artifactId}-secrets
+          - name: AFOREDIGITAL_DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: aforedigital.db-password
+                name: ${project.artifactId}-secrets
+          - name: AFOREGLOBAL_DB_SERVICE_NAME
+            value: '10.27.142.232'
+          - name: AFOREGLOBAL_DB_PORT
+            value: '5432'
+          - name: AFOREGLOBAL_DB_NAME
+            value: 'aforeglobal'
+          - name: AFOREGLOBAL_DB_USER
+            valueFrom:
+              secretKeyRef:
+                key: aforeglobal.db-user
+                name: ${project.artifactId}-secrets
+          - name: AFOREGLOBAL_DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: aforeglobal.db-password
+                name: ${project.artifactId}-secrets
+          - name: BROKER_HOST
+            value: 'broker-amq-tcp.aforecoppel-apis.svc.cluster.local'
+          - name: BROKER_PORT
+            value: '61616'
+          - name: BROKER_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: broker.user
+                name: ${project.artifactId}-secrets
+          - name: BROKER_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: broker.password
+                name: ${project.artifactId}-secrets
+          volumeMounts:
+            - mountPath: /deployments/application.properties
+              name: volume-${project.artifactId}-properties
+              subPath: application.properties
+            - mountPath: /deployments/logback.xml
+              name: volume-${project.artifactId}-logback
+              subPath: logback.xml
+            - mountPath: /opt/security/keystore
+              name: volume-${project.artifactId}-keystore
+              readOnly: true
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: ${project.artifactId}-properties
+          name: volume-${project.artifactId}-properties
+        - configMap:
+            defaultMode: 420
+            name: ${project.artifactId}-logback
+          name: volume-${project.artifactId}-logback
+        - secret:
+            defaultMode: 420
+            secretName: keystore-secret
+          name: volume-${project.artifactId}-keystore
